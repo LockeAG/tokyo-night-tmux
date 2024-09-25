@@ -30,6 +30,10 @@ tmux set -g status-style bg="${THEME[background]}"
 
 TMUX_VARS="$(tmux show -g)"
 
+# Define rounded edge characters
+LEFT_ROUNDED=""
+RIGHT_ROUNDED=""
+
 default_window_id_style="digital"
 default_pane_id_style="hsquare"
 default_zoom_id_style="dsquare"
@@ -54,14 +58,14 @@ battery_status="#($SCRIPTS_PATH/battery-widget.sh)"
 
 #+--- Bars LEFT ---+
 # Session name
-tmux set -g status-left "#[fg=${THEME[bblack]},bg=${THEME[blue]},bold] #{?client_prefix,󰠠 ,#[dim]󰤂 }#[bold,nodim]#S "
+tmux set -g status-left "#[fg=${THEME[blue]}]${LEFT_ROUNDED}#[fg=${THEME[bblack]},bg=${THEME[blue]},bold] #{?client_prefix,󰠠 ,#[dim]󰤂 }#[bold,nodim]#S "
 
 #+--- Windows ---+
 # Focus
-tmux set -g window-status-current-format "$RESET#[fg=${THEME[green]},bg=${THEME[bblack]}] #{?#{==:#{pane_current_command},ssh},󰣀 , }#[fg=${THEME[foreground]},bold,nodim]$window_number#W#[nobold]#{?window_zoomed_flag, $zoom_number, $custom_pane}#{?window_last_flag, , }"
+tmux set -g window-status-current-format "$RESET#[fg=${THEME[green]},bg=${THEME[bblack]}] #{?#{==:#{pane_current_command},ssh},󰣀 , }#[fg=${THEME[foreground]},bold,nodim]$window_number#W#[nobold]#{?window_zoomed_flag, $zoom_number, $custom_pane}#{?window_last_flag, , } #[fg=${THEME[black]},bg=${THEME[background]}]${RIGHT_ROUNDED}"
 # Unfocused
 tmux set -g window-status-format "$RESET#[fg=${THEME[foreground]}] #{?#{==:#{pane_current_command},ssh},󰣀 , }${RESET}$window_number#W#[nobold,dim]#{?window_zoomed_flag, $zoom_number, $custom_pane}#[fg=${THEME[yellow]}]#{?window_last_flag,󰁯  , }"
 
 #+--- Bars RIGHT ---+
-tmux set -g status-right "$battery_status $current_path $cmus_status $netspeed $git_status $wb_git_status $date_and_time"
+tmux set -g status-right "$battery_status $current_path $cmus_status $netspeed $git_status $wb_git_status #[fg=${THEME[black]}]${LEFT_ROUNDED}$date_and_time#[fg=${THEME[black]},bg=${THEME[background]}]${RIGHT_ROUNDED} "
 tmux set -g window-status-separator ""

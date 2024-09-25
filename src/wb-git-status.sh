@@ -57,7 +57,7 @@ get_github_counts() {
     exit 1
   fi
 
-  PROVIDER_ICON="$RESET#[fg=${THEME[foreground]}] "
+  PROVIDER_ICON=""
 
   PR_COUNT=$(gh pr list --json number --jq 'length')
   REVIEW_COUNT=$(gh pr status --json reviewRequests --jq '.currentUser.prs | length')
@@ -73,7 +73,7 @@ get_gitlab_counts() {
     exit 1
   fi
 
-  PROVIDER_ICON="$RESET#[fg=#fc6d26] "
+  PROVIDER_ICON=""
 
   PR_COUNT=$(glab mr list --json id --jq 'length')
   REVIEW_COUNT=$(glab mr list --reviewer=@me --json id --jq 'length')
@@ -87,14 +87,21 @@ elif [[ "$PROVIDER" == "gitlab.com" ]]; then
   get_gitlab_counts
 fi
 
-# Build status strings based on counts
-[ "$PR_COUNT" -gt 0 ] && PR_STATUS="#[fg=${THEME[ghgreen]},bg=${THEME[background]},bold] ${RESET}${PR_COUNT} "
-[ "$REVIEW_COUNT" -gt 0 ] && REVIEW_STATUS="#[fg=${THEME[ghyellow]},bg=${THEME[background]},bold] ${RESET}${REVIEW_COUNT} "
-[ "$ISSUE_COUNT" -gt 0 ] && ISSUE_STATUS="#[fg=${THEME[ghgreen]},bg=${THEME[background]},bold] ${RESET}${ISSUE_COUNT} "
-[ "$BUG_COUNT" -gt 0 ] && BUG_STATUS="#[fg=${THEME[ghred]},bg=${THEME[background]},bold] ${RESET}${BUG_COUNT} "
+# Define rounded edge characters
+LEFT_ROUNDED=""
+RIGHT_ROUNDED=""
+
+# Build status strings with rounded edges
+[ "$PR_COUNT" -gt 0 ] && PR_STATUS="#[fg=${THEME[ghgreen]}]${LEFT_ROUNDED}#[bg=${THEME[ghgreen]},fg=${THEME[background]},bold]  ${PR_COUNT} #[bg=${THEME[background]},fg=${THEME[ghgreen]}]${RIGHT_ROUNDED}"
+[ "$REVIEW_COUNT" -gt 0 ] && REVIEW_STATUS="#[fg=${THEME[ghyellow]}]${LEFT_ROUNDED}#[bg=${THEME[ghyellow]},fg=${THEME[background]},bold]  ${REVIEW_COUNT} #[bg=${THEME[background]},fg=${THEME[ghyellow]}]${RIGHT_ROUNDED}"
+[ "$ISSUE_COUNT" -gt 0 ] && ISSUE_STATUS="#[fg=${THEME[ghgreen]}]${LEFT_ROUNDED}#[bg=${THEME[ghgreen]},fg=${THEME[background]},bold]  ${ISSUE_COUNT} #[bg=${THEME[background]},fg=${THEME[ghgreen]}]${RIGHT_ROUNDED}"
+[ "$BUG_COUNT" -gt 0 ] && BUG_STATUS="#[fg=${THEME[ghred]}]${LEFT_ROUNDED}#[bg=${THEME[ghred]},fg=${THEME[background]},bold]  ${BUG_COUNT} #[bg=${THEME[background]},fg=${THEME[ghred]}]${RIGHT_ROUNDED}"
+
+# Provider icon with rounded edges
+PROVIDER_STATUS="#[fg=${THEME[foreground]}]${LEFT_ROUNDED}#[bg=${THEME[foreground]},fg=${THEME[background]},bold] ${PROVIDER_ICON} #[bg=${THEME[background]},fg=${THEME[foreground]}]${RIGHT_ROUNDED}"
 
 # Combine all status components
-WB_STATUS="#[fg=${THEME[black]},bg=${THEME[background]},bold] $RESET$PROVIDER_ICON $RESET$PR_STATUS$REVIEW_STATUS$ISSUE_STATUS$BUG_STATUS"
+WB_STATUS="${PROVIDER_STATUS} ${PR_STATUS} ${REVIEW_STATUS} ${ISSUE_STATUS} ${BUG_STATUS}"
 
 # Output the final status line
 echo "$WB_STATUS"
